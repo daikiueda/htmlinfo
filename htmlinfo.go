@@ -24,7 +24,7 @@ func (v *Values) get(key string) string {
 	return reflect.Indirect(r).FieldByName(key).String()
 }
 
-func (v *Values) Print(fields []string, root string) {
+func (v *Values) print(fields []string, root string) {
 	var recode string
 	for _, name := range fields {
 		val := v.get(name)
@@ -37,7 +37,7 @@ func (v *Values) Print(fields []string, root string) {
 	fmt.Println(strings.TrimSpace(recode))
 }
 
-func PickoutFrom(path string) (v Values) {
+func pickOutFrom(path string) (v Values) {
 
 	file, _ := os.Open(path)
 	reader := bufio.NewReader(file)
@@ -52,7 +52,7 @@ func PickoutFrom(path string) (v Values) {
 	return v
 }
 
-func PrintHeader(fields []string) {
+func printHeader(fields []string) {
 	var header string
 	for _, name := range fields {
 		header += fmt.Sprintf("%s\t", name)
@@ -63,6 +63,7 @@ func PrintHeader(fields []string) {
 func main() {
 	app := cli.NewApp()
 	app.Name = "htmlinfo"
+	app.Version = "0.0.1"
 	app.Usage = "Print HTML info ( title, description, keywords )"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -71,8 +72,8 @@ func main() {
 			Usage: "Set top directory of HTML files.",
 		},
 		cli.BoolFlag{
-			Name:  "no-header, H",
-			Usage: "language for the greeting.",
+			Name:  "no-header",
+			Usage: "Hide header.",
 		},
 	}
 	app.Action = func(c *cli.Context) {
@@ -87,7 +88,7 @@ func main() {
 		}
 
 		if !c.Bool("no-header") {
-			PrintHeader(fields)
+			printHeader(fields)
 		}
 
 		filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -96,8 +97,8 @@ func main() {
 			}
 
 			if isHtml, _ := regexp.MatchString(".*.html?$", path); isHtml {
-				v := PickoutFrom(path)
-				v.Print(fields, root)
+				v := pickOutFrom(path)
+				v.print(fields, root)
 			}
 
 			return nil
