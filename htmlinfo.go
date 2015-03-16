@@ -10,14 +10,6 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func printHeader(fields []string) {
-	var header string
-	for _, name := range fields {
-		header += fmt.Sprintf("%s\t", name)
-	}
-	fmt.Println(strings.TrimSpace(header))
-}
-
 func main() {
 	app := cli.NewApp()
 	app.Name = "htmlinfo"
@@ -56,19 +48,31 @@ func main() {
 			printHeader(fields)
 		}
 
-		filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-			if info.IsDir() {
-				return nil
-			}
-
-			if isHtml, _ := regexp.MatchString(".*.html?$", path); isHtml {
-				var v values
-				v.pickOutFrom(path, charset)
-				v.print(fields, root)
-			}
-
-			return nil
-		})
+		printAll(root, fields, charset)
 	}
 	app.Run(os.Args)
+}
+
+func printAll(root string, fields []string, charset string) {
+	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		if isHtml, _ := regexp.MatchString(".*.html?$", path); isHtml {
+			var v values
+			v.pickOutFrom(path, charset)
+			v.print(fields, root)
+		}
+
+		return nil
+	})
+}
+
+func printHeader(fields []string) {
+	var header string
+	for _, name := range fields {
+		header += fmt.Sprintf("%s\t", name)
+	}
+	fmt.Println(strings.TrimSpace(header))
 }

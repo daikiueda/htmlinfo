@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"strings"
 
-	"code.google.com/p/mahonia"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -54,11 +53,4 @@ func (v *values) pickOutFrom(path string, charset string) {
 		v.Description = decodeText(v.Description, charset)
 		v.Keywords = decodeText(v.Keywords, charset)
 	}
-}
-
-func decodeText(text string, charset string) string {
-	if charset == "" {
-		return text
-	}
-	return mahonia.NewDecoder(charset).ConvertString(text)
 }
